@@ -60,7 +60,7 @@ int main()
 		p.shi2_current_uses = 0;
 		p.shi2_passwd = NULL; // no password
 		
-		p.shi2_path = LPTSTR(L"C:\\tmp");
+		p.shi2_path = LPTSTR(L"C:\\tmp$");
 
 		res = NetShareAdd(NULL,2,(LPBYTE) &p, &parm_err);
 		if (res == 0)
